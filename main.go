@@ -3,12 +3,13 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type book struct {
-	ID     int32   `json:"id"`
+	ID     int64   `json:"id"`
 	Title  string  `json:"title"`
 	Author string  `json:"author"`
 	Price  float64 `json:"price"`
@@ -36,9 +37,27 @@ func addBook(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newBook)
 }
 
+func getBookByID(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "ID is invalid"})
+		return
+	}
+
+	for _, b := range books {
+		if b.ID == id {
+			c.IndentedJSON(http.StatusOK, b)
+			return
+		}
+	}
+
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "book not found"})
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/books", getBooks)
+	router.GET("/books/:id", getBookByID)
 	router.POST("/books", addBook)
 
 	router.Run("localhost:8080")
