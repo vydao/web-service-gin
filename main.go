@@ -19,9 +19,13 @@ var books = []book{
 	{ID: 3, Title: "Sarah Vaughan and Clifford Brown", Author: "Sarah Vaughan", Price: 39.99},
 }
 
-func getBookings(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK)
+func getBooks(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, books)
 }
 
 func main() {
+	router := gin.Default()
+	router.GET("/books", getBooks)
+
+	router.Run("localhost:8080")
 }
